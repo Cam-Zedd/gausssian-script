@@ -177,70 +177,74 @@ for i in range(len(filetoparser)):
                 g.write(f'\n{x[o]},{spectrum[o]/spectrum.max()}')
 
         # RAMAN
-        if "Raman" or "RAMAN" in line:
-            print(f"gathering RAMAN data for file:{filetoparser[i]}")
-            while "Anharmonic Raman Spectroscopy" not in line:
-                line = f.readline()
-            line = f.readline()
-            while "Mode(n)" not in line:
-                line = f.readline()
-            line = f.readline()
-            print("1st line of fundamentals",)
-            print(line)
-            while not line.isspace():  # seek the space
-                energyRaman[i].append(float(line.split()[2]))
-                Ramanintensityharm[i].append(float(line.split()[3]))
-                Ramanintensityanh[i].append(float(line.split()[4]))
-                line = f.readline()
-            line = f.readline()
-            while "Mode(n)" not in line:
-                line = f.readline()
-            line = f.readline()
-            print("1st line of overtones ",)
-            print(line)
-            while not line.isspace():  # seek the space
-                energyRaman[i].append(float(line.split()[-2]))
-                Ramanintensityanh[i].append(float(line.split()[-1]))
-                line = f.readline()
-            line = f.readline()
-            while "Mode(n)" not in line:
-                line = f.readline()
-            line = f.readline()
-            print("1stline of CB ",)
-            print(line)
-            while not line.isspace():  # seek the space
-                energyRaman[i].append(float(line.split()[-2]))
-                Ramanintensityanh[i].append(float(line.split()[-1]))
-                line = f.readline()
-            line = f.readline()
-
-            # Starting RAMAN
-        print("for file", filetoparser[i])
-        minraman[i] = np.min(energyRaman[i])
-        maxraman[i] = np.max(energyRaman[i])
-        maxintensity[i] = max(Ramanintensityanh[i])
-        x = np.linspace(0.01, maxcm[i] * 1.2, num)
-        print("for file", filetoparser[i], "named", name[i])
-        print("Starting to plot RAMAN")
-        spectrum = spec(energyRaman[i], Ramanintensityanh[i], sigma, x)
-        ax1.plot(
-            x,
-            spectrum /
-            np.max(spectrum),
-            "-",
-            label=f"{name[i]}",
-            color=c[i],
-            lw=3)
-        print(
-            f"RAMAN spectrum of {name[i]} achieved in :"
-            "%s seconds" %
-             (time.time() - start_time))
-        # Store IR in CSV
-        fname = filetoparser[i]
-        with open(f"{fname}-RAMAN.csv", "w") as g:
-            g.write("E(cm-1),I")
-            for o in range(num):
-                g.write(f'\n{x[o]},{spectrum[o]/spectrum.max()}')
+        for line in f:
+            if "Anharmonic Raman Spectroscopy" in line:
+                    print(line)
+                    print(f"gathering RAMAN data for file:{filetoparser[i]}")
+                    while "Anharmonic Raman Spectroscopy" not in line:
+                        line = f.readline()
+                    line = f.readline()
+                    while "Mode(n)" not in line:
+                        line = f.readline()
+                    line = f.readline()
+                    print("1st line of fundamentals",)
+                    print(line)
+                    while not line.isspace():  # seek the space
+                        energyRaman[i].append(float(line.split()[2]))
+                        Ramanintensityharm[i].append(float(line.split()[3]))
+                        Ramanintensityanh[i].append(float(line.split()[4]))
+                        line = f.readline()
+                    line = f.readline()
+                    while "Mode(n)" not in line:
+                        line = f.readline()
+                    line = f.readline()
+                    print("1st line of overtones ",)
+                    print(line)
+                    while not line.isspace():  # seek the space
+                        energyRaman[i].append(float(line.split()[-2]))
+                        Ramanintensityanh[i].append(float(line.split()[-1]))
+                        line = f.readline()
+                    line = f.readline()
+                    while "Mode(n)" not in line:
+                        line = f.readline()
+                    line = f.readline()
+                    print("1stline of CB ",)
+                    print(line)
+                    while not line.isspace():  # seek the space
+                        energyRaman[i].append(float(line.split()[-2]))
+                        Ramanintensityanh[i].append(float(line.split()[-1]))
+                        line = f.readline()
+                    line = f.readline()
+			        
+                    # Starting RAMAN
+                    print("for file", filetoparser[i])
+                    minraman[i] = np.min(energyRaman[i])
+                    maxraman[i] = np.max(energyRaman[i])
+                    maxintensity[i] = max(Ramanintensityanh[i])
+                    x = np.linspace(0.01, maxcm[i] * 1.2, num)
+                    print("for file", filetoparser[i], "named", name[i])
+                    print("Starting to plot RAMAN")
+                    spectrum = spec(energyRaman[i], Ramanintensityanh[i], sigma, x)
+                    ax1.plot(
+                        x,
+                        spectrum /
+                        np.max(spectrum),
+                        "-",
+                        label=f"{name[i]}",
+                        color=c[i],
+                        lw=3)
+                    print(
+                        f"RAMAN spectrum of {name[i]} achieved in :"
+                        "%s seconds" %
+                         (time.time() - start_time))
+                    # Store IR in CSV
+                    fname = filetoparser[i]
+                    with open(f"{fname}-RAMAN.csv", "w") as g:
+                        g.write("E(cm-1),I")
+                        for o in range(num):
+                            g.write(f'\n{x[o]},{spectrum[o]/spectrum.max()}')
+            else:
+                pass
 
 maxcm = list(filter(None, maxcm))
 maxraman = list(filter(None, maxraman))
@@ -252,11 +256,15 @@ ax3.set_ylim(0, 1.05)
 ax3.set_xlabel(r"Energy (cm$^{-1}$)")
 ax3.set_ylabel(r"Normalized Intensity")
 
-ax1.legend(loc='upper left', frameon=False)
-ax1.set_xlim(0, max(maxraman) * 1.1)
-ax1.set_ylim(0, 1.05)
-ax1.set_xlabel(r"RAMAN shift (cm$^{-1}$)")
-ax1.set_ylabel(r"Normalized Intensity")
+if not Ramanintensityanh[0]:
+    print("No raman to plot")
+    fig1.clf()	
+else:
+    ax1.legend(loc='upper left', frameon=False)
+    ax1.set_xlim(0, max(maxraman) * 1.1)
+    ax1.set_ylim(0, 1.05)
+    ax1.set_xlabel(r"RAMAN shift (cm$^{-1}$)")
+    ax1.set_ylabel(r"Normalized Intensity")
 
 print("--- The process took %s seconds ---" % (time.time() - start_time))
 
