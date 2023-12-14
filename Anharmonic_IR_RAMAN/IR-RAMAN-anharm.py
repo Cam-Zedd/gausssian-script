@@ -51,7 +51,7 @@ filetoparser = ["optim-PBE0-S0-FREQ-ANH-RAMAN-double.log"]
 
 ######### COMPOUND NAMES #########
 
-name = [r"PBE", r"PBE0", r"Mgo", r"IR-alone", r"TiO2_rutile"]
+name = [r"filename"]
 
 ######### START THE LISTS #########
 
